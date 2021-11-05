@@ -124,5 +124,68 @@ FileSystem은 파일 내용을 열고 접근하는 것을 비록한 표준 POSIX
 
 # 비동기 프로그램 흐름 살펴보기
 
-JS로 개발하는 대부분의 사람들은 클라이언트 애플리케이션에서처럼 한 브라우저 내에서 한 번에 한 명만 실행을 한다고 생각한다.
-서버에서 JS를 사용하는 것은 이상해 보인다. 여러 명이 동시에 접근하는 JS애플리케이션을 만드는 것은 더욱 더 이상하게 느낀다.
+```js
+var http = require("http");
+var fs = require("fs");
+
+function writeNumbers(res) {
+  var counter = 0;
+
+  for (var i = 0; i < 100; i++) {
+    counter++;
+    res.write(counter.toString() + "\n");
+  }
+}
+
+http
+  .createServer(function (req, res) {
+    var query = require("url").parse(req.url).query;
+    var app = require("querystring").parse(query).file + ".txt";
+
+    res.writeHead(200, { "Content-Type": "text/plain" });
+
+    writeNumbers(res);
+
+    setTimeout(function () {
+      console.log("opening " + app);
+
+      fs.readFile(app, "utf8", function (error, data) {
+        if (error) {
+          res.write("Could not find or open for reading\n");
+        } else {
+          res.write(data);
+        }
+        res.end();
+      });
+    }, 2000);
+  })
+  .listen(8124);
+
+console.log("Server is running on 8124");
+```
+
+다음과 같은 코드를 작성해보고 실행해보자.
+함수가 동기 방식으로 호출되어 1부터 100까지의 숫자를 쓰게 된다.
+
+그 다음 파일을 여는 것은 파일의 이름이 쿼리 문자열 매개변수로 전달된다. 뿐만 아니라 타이머 이벤트가 발생된 후에만 파일을 연다.
+
+숫자를 출력하는 루프는 연산이 많은 프로세스를 수행하면서 프로세스가 종료될 때까지 차단되는 경우에 발생하는 것과 유사하게 애플리케이션을 지연시키는 데 사용되었다.
+결과적으로 이 프로그램은 동기와 비동기 프로세스를 둘 다 결합하고 있는것이다.
+
+실행 결과는 (http://localhost:8124/?file=name)
+
+```
+Server is running on 8124
+opening name.txt
+opening undefined.txt
+```
+
+다음과 같이 나오는데 `opening undefined.txt`요 부분이 심상치 않다.
+왜 찍은 기억도 없는 console.log가 찍히는 걸까? 그 이유는 브라우저에서 보낸 웹 요청 처리를 할 때 브라우저가 요청을 한 번이 아니라 여러번 할 수 있기 때문이다.
+예를 들어서 favicon.ico를 찾는 두 번째 요청을 보냈을 수도 있다.
+
+때문에 쿼리스트링을 처리할 때 데이터가 제공되었는지를 확인하고 데이터가 없는 요청은 무시하게 작성해야 한다.
+
+```js
+if (app) console.log("opening " + app);
+```

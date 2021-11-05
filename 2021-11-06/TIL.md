@@ -42,5 +42,37 @@
 
     이는 JavaScript 개발자 입장에서 라이브러리 내의 전역 변수때문에 발생하는 예기치 못한 데이터 충돌 문제를 더 이상 겪지 않아도 되는 것을 의미한다.
 
-- ## Process
-- ## Buffer
+  - ## Process
+
+    각 Node 애플리케이션은 Node의 process 객체 인스턴스다.
+    process객체의 메서드 및 속성 대부분은 애플리케이션 및 환경에 대한 식별과 정보를 제공한다.
+
+    또한 STDIO 스트림도 래핑하고 있다. stdin과 stdout은 비동기적이며 각각 읽기와 쓰기가 가능하다.
+    ![](https://images.velog.io/images/hjh040302/post/8a03dd34-a05f-4490-94b5-f00381e8202b/image.png)
+
+    무언가를 입력한 후 엔터를 누를때 마다 입력한 내용이 그대로 되풀이된다.
+    또한 유용한 메소드로는 memoryUsage가 있다. Node애플리케이션의 메모리 사용량을 보여준다.
+
+    `{ rss: 32309248, heapTotal: 6717440, heapUsed: 4409224, external: 926092, arrayBuffers: 10083 }`
+
+    heapTotal, heapUsed는 V8엔진의 메모리 사용량을 의미한다.
+
+    마지막으로 nextTick이다. 이 메서드는 Node의 이벤트 루프 다음 틱(루프)에서 호출될 콜백함수를 연결해준다.
+
+    ```js
+    var asyncFunction = function (data, callback) {
+      process.nextTick(function () {
+        callback(data);
+      });
+    };
+    ```
+
+    이는 아래의 코드와 같다.
+
+    ```js
+    setTimeout(function () {
+      callback(val);
+    }, 0);
+    ```
+
+  - ## Buffer

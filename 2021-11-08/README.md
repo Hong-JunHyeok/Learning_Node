@@ -203,3 +203,116 @@ require.cache객체에는 각 파일의 모듈 객체가 들어가있다.
 require.main은 노드 실행 시 첫 모듈을 가리킨다.
 즉, 현재 파일이 첫 모듈인지 알아볼려면 require.main === module을 실행하면 된다.
 또한, 첫 모듈의 이름을 알아보려면 require.main.filename으로 확인하면 된다.
+
+# Process
+
+현재 실행되고 있는 노드 프로세스에 대한 정보를 담고있다.
+
+# OS 모듈
+
+노드는 OS 모듈에 운영체제의 정보가 있어서 가져올 수 있다.
+
+```console
+> os.arch();
+'arm64'
+> os.platform();
+'darwin'
+> os.type();
+'Darwin'
+> os.uptime();
+1228442
+> os.hostname();
+'hongjunhyeog-ui-MacBookPro.local'
+> os.release();
+'20.5.0'
+> os.homedir();
+'/Users/hongjunhyeok'
+> os.tmpdir();
+'/var/folders/hg/qnl3v2650lbcw0z_tsvvlv080000gn/T'
+> os.cpus();
+[
+  {
+    model: 'Apple M1',
+    speed: 24,
+    times: { user: 77712000, nice: 0, sys: 58963820, idle: 407816550, irq: 0 }
+  },
+  {
+    model: 'Apple M1',
+    speed: 24,
+    times: { user: 70205920, nice: 0, sys: 53699490, idle: 420550410, irq: 0 }
+  },
+  {
+    model: 'Apple M1',
+    speed: 24,
+    times: { user: 62483240, nice: 0, sys: 47985530, idle: 433987290, irq: 0 }
+  },
+  {
+    model: 'Apple M1',
+    speed: 24,
+    times: { user: 56711500, nice: 0, sys: 43944230, idle: 443799520, irq: 0 }
+  },
+  {
+    model: 'Apple M1',
+    speed: 24,
+    times: {
+      user: 262664800,
+      nice: 0,
+      sys: 48644390,
+      idle: 233146140,
+      irq: 0
+    }
+  },
+  {
+    model: 'Apple M1',
+    speed: 24,
+    times: { user: 49711300, nice: 0, sys: 16785310, idle: 477958820, irq: 0 }
+  },
+  {
+    model: 'Apple M1',
+    speed: 24,
+    times: { user: 32098440, nice: 0, sys: 8291520, idle: 504065560, irq: 0 }
+  },
+  {
+    model: 'Apple M1',
+    speed: 24,
+    times: { user: 26712100, nice: 0, sys: 6059280, idle: 511683610, irq: 0 }
+  }
+]
+> os.freemem();
+146735104
+> os.totalmem();
+17179869184
+```
+
+# Path 모듈
+
+폴더와 파일의 경로를 쉽게 조작하도록 도와주는 모듈
+
+ex) 운영체제별로 경로 구분자가 다르기때문.
+
+```js
+const { isAbsolute } = require("path");
+const path = require("path");
+
+const string = __filename;
+
+console.log(path.sep);
+console.log(path.delimiter);
+console.log(__dirname);
+console.log(path.dirname(string));
+console.log(path.extname(string));
+console.log(path.basename(string, path.extname(string)));
+console.log(path.parse(string));
+console.log(
+  path.format({
+    base: "os.js",
+    dir: "/Users/hongjunhyeok/Documents/GitHub/Learning_Node/2021-11-08",
+    ext: ".js",
+    name: "os",
+    root: "/",
+  })
+);
+console.log(isAbsolute("C:\\"));
+console.log(isAbsolute("./class.js"));
+console.log(path.normalize("C://users\\\\zerocho\\path.js"));
+```

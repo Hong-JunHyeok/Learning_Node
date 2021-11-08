@@ -195,3 +195,11 @@ React, Angular, Vue 등등의 웹 프레임워크가 Node기반으로 돌아간�
 
 다른 부분은 브라우저에서의 JS랑 동일하지만 최상위 스코프에 존재하는 this는 module.exports를 의미한다.
 함수 선언문 내에서의 this는 global객체를 가리킨다.
+
+require나 exports는 아무데서나 사용해도 된다.
+require.cache객체에는 각 파일의 모듈 객체가 들어가있다.
+한번 require한 파일은 cache에 저장되므로 다음번에 사용할때는 cache에 있는 것이 재사용되는 것이다.
+
+require.main은 노드 실행 시 첫 모듈을 가리킨다.
+즉, 현재 파일이 첫 모듈인지 알아볼려면 require.main === module을 실행하면 된다.
+또한, 첫 모듈의 이름을 알아보려면 require.main.filename으로 확인하면 된다.

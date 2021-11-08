@@ -190,3 +190,8 @@ React, Angular, Vue 등등의 웹 프레임워크가 Node기반으로 돌아간�
 • 저자의 블로그 ES2015+: https://zerocho.com/category/EcmaScript
 
 • 모던 자바스크립트 튜토리얼: https://ko.javascript.info/
+
+# 노드에서 this란?
+
+다른 부분은 브라우저에서의 JS랑 동일하지만 최상위 스코프에 존재하는 this는 module.exports를 의미한다.
+함수 선언문 내에서의 this는 global객체를 가리킨다.

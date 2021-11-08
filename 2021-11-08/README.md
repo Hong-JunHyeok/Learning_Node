@@ -55,6 +55,16 @@ libuv 라이브러리는 노드의 특성인 이벤트 기반, 논 블로킹 I/O
 
 이때 이벤트 루프라는 개념이 등장하게 되는데, 여러 이벤트가 동시에 실행됐을때, 어떤 순서로 콜백을 실행할지 이벤트루프가 정해준다.
 
+# Event
+
+- on() : 이벤트 발생 시 콜백과 연결시킨다. (중복 가능)
+- addListener() : on메서드와 같다. (단, 중복시 오버라이딩)
+- emit() : 이벤트를 발생시키는 메서드
+- once( ) : 이벤트를 한번만 발생하도록 만드는 것
+- removeAllListeners() : 해당 이벤트에 연결된 리스너들을 제거한다.
+- removeListener() : 이벤트와 리스너를 전달받아서 해당 리스너를 제거한다.
+- listenerCount() : 해당 이벤트의 리스너 개수를 리턴한다.
+
 # setTimeout !== JavaScript Function
 
 그 이유는 setTimeout은 백그라운드이기 때문이다.
@@ -162,44 +172,6 @@ C, C++, Rust, Go같은 언어로 처리하는 것이 더욱 효율적이기 때�
 
 웹, 모바일, 데스크톱 애플리케이션 개발에도 사용되기 시작했다.
 React, Angular, Vue 등등의 웹 프레임워크가 Node기반으로 돌아간다. Electron으로 데스크톱 개발을 할 수 있다.
-
-• 노드 공식 사이트: https://nodejs.org/ko
-
-• 노드 공식 사이트의 가이드: https://nodejs.org/ko/docs/guides/
-
-• 노드에 대한 전반적인 설명: https://nodejs.dev/
-
-• 이벤트 루프 설명: https://nodejs.org/ko/docs/guides/event-loop-timers-and-nexttick/
-
-• 이벤트 루프에 대한 시각적 설명: http://latentflip.com/loupe
-
-• VS Code 공식 사이트: https://code.visualstudio.com/
-
-• Homebrew 사이트: https://brew.sh/index_ko
-
-• ES2015 설명: https://developer.mozilla.org/ko/docs/Web/JavaScript/New_in_JavaScript/ECMAScript_6_support_in_Mozilla
-
-• ES 상세 후보군: https://github.com/tc39/proposals
-
-• ES2015+ 브라우저/서버 호환 여부: http://kangax.github.io/compat-table/es6/
-
-• 브라우저별 기능 지원 여부 확인: https://caniuse.com/
-
-• 노드 버전별 ECMAScript 스펙: http://node.green
-
-• AJAX 설명: https://developer.mozilla.org/ko/docs/Web/Guide/AJAX
-
-• axios: https://github.com/axios/axios
-
-• FormData 설명: https://developer.mozilla.org/ko/docs/Web/API/FormData
-
-• ESLint 툴: https://eslint.org/
-
-• 에어비앤비 코딩 스타일: https://github.com/airbnb/javascript
-
-• 저자의 블로그 ES2015+: https://zerocho.com/category/EcmaScript
-
-• 모던 자바스크립트 튜토리얼: https://ko.javascript.info/
 
 # 노드에서 this란?
 

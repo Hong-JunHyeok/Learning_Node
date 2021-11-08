@@ -144,3 +144,17 @@ C, C++, Rust, Go같은 언어로 처리하는 것이 더욱 효율적이기 때�
 
 웹, 모바일, 데스크톱 애플리케이션 개발에도 사용되기 시작했다.
 React, Angular, Vue 등등의 웹 프레임워크가 Node기반으로 돌아간다. Electron으로 데스크톱 개발을 할 수 있다.
+
+• 노드 공식 사이트: https://nodejs.org/ko
+
+• 노드 공식 사이트의 가이드: https://nodejs.org/ko/docs/guides/
+
+• 노드에 대한 전반적인 설명: https://nodejs.dev/
+
+• 이벤트 루프 설명: https://nodejs.org/ko/docs/guides/event-loop-timers-and-nexttick/
+
+• 이벤트 루프에 대한 시각적 설명: http://latentflip.com/loupe
+
+• VS Code 공식 사이트: https://code.visualstudio.com/
+
+• Homebrew 사이트: https://brew.sh/index_ko

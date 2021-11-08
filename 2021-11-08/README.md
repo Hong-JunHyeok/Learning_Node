@@ -1,3 +1,11 @@
+# Node 모듈 시스템
+
+기존의 브라우저에서의 자바스크립트는 코드를 모듈로 만들 수 없었다. 모듈이란 특정한 기능을 하는 함수나 변수들의 집합인데, 모듈을 만들어 놓으면 여러 프로그램에 해당 모듈을 재사용할 수 있어서 좋다.
+
+서버사이드에서 실행되는 Node에서는 모듈 시스템이 필요하기 때문에 require/exports로 지원을 한다.
+
+2015년 이후, 브라우저에서도 import/export의 모듈 개념이 도입되면서 앞으로 더 많은 브라우저가 모듈 시스템을 지원할 것으로 보인다.
+
 # 서버란 무엇인가?
 
 Node.js로 서버 애플리케이션을 구축할 수 있다.
@@ -158,3 +166,27 @@ React, Angular, Vue 등등의 웹 프레임워크가 Node기반으로 돌아간�
 • VS Code 공식 사이트: https://code.visualstudio.com/
 
 • Homebrew 사이트: https://brew.sh/index_ko
+
+• ES2015 설명: https://developer.mozilla.org/ko/docs/Web/JavaScript/New_in_JavaScript/ECMAScript_6_support_in_Mozilla
+
+• ES 상세 후보군: https://github.com/tc39/proposals
+
+• ES2015+ 브라우저/서버 호환 여부: http://kangax.github.io/compat-table/es6/
+
+• 브라우저별 기능 지원 여부 확인: https://caniuse.com/
+
+• 노드 버전별 ECMAScript 스펙: http://node.green
+
+• AJAX 설명: https://developer.mozilla.org/ko/docs/Web/Guide/AJAX
+
+• axios: https://github.com/axios/axios
+
+• FormData 설명: https://developer.mozilla.org/ko/docs/Web/API/FormData
+
+• ESLint 툴: https://eslint.org/
+
+• 에어비앤비 코딩 스타일: https://github.com/airbnb/javascript
+
+• 저자의 블로그 ES2015+: https://zerocho.com/category/EcmaScript
+
+• 모던 자바스크립트 튜토리얼: https://ko.javascript.info/

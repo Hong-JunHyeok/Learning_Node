@@ -29,3 +29,88 @@ http
 ```
 
 ![](https://images.velog.io/images/hjh040302/post/1e193562-bcd4-4ed5-9729-572118860c9a/image.png)
+
+# Localhost와 포트
+
+localhost = 컴퓨터 내부의 주소
+
+외부에서는 접근할 수 없고 자신의 컴퓨터에서만 접근할 수 있다.
+
+localhost === 127.0.0.1
+
+포트는 서버 내에서 프로세스를 구분하는 번호다.
+서버는 프로세스에 포트를 다르게 할당하여 들어오는 요청을 구분한다.
+
+만약 포트가 충돌된다면 에러가 발생한다.
+
+헤더 - 정보가 기록되는 부분
+바디 - 데이터가 기록되는 부분
+
+**서버는 소스코드가 변경될 때 자동으로 변경사항을 반영하지 않는다.**
+
+# 한번에 여러 서버를 실행하는 방법
+
+```js
+const http = require("http");
+
+http
+  .createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.write("<h1>Hello Node!</h1>");
+    res.end("<p>Hello Server!</p>");
+  })
+  .listen(8080, () => {
+    console.log(`Server is running at 8080`);
+  });
+
+http
+  .createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.write("<h1>Hello Node!</h1>");
+    res.end("<p>Hello Server!</p>");
+  })
+  .listen(8081, () => {
+    console.log(`Server is running at 8081`);
+  });
+```
+
+단, 포트가 달라야만 한다.
+
+# fs로 데이터 전달하기
+
+```js
+const http = require("http");
+const fs = require("fs").promises;
+
+http
+  .createServer(async (req, res) => {
+    try {
+      const data = await fs.readFile(__dirname + "/server2.html");
+      res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end(data);
+    } catch (error) {
+      console.error(error);
+      res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end(error.message);
+    }
+  })
+  .listen(8080, () => {
+    console.log(`Server is running at 8080`);
+  });
+```
+
+data 변수에 저장된 버퍼를 그대로 클라이언트에 보내면 된다.
+
+이때, 요청 처리 과정에서 에러가 발생하든지 여부와 관계없이 응답을 보내야한다.
+그렇지 않으면 요청한 클라이언트 측에서 하염없이 응답을 기다리게 된다.
+
+## REST와 라우팅 사용해보기
+
+요청의 내용이 주소를 통해 표현되므로 서버가 이해하기 쉬운 주소를 사용하는 것이 좋다.
+주소에 의미가 있는 것, 그것이 REST이다. 이는 일종의 약속이므로 REST API라고도 부른다.
+
+[REST API설명글](https://meetup.toast.com/posts/92)
+
+만약, 로그인같이 애매한 동작이 있다면 POST를 사용하면 된다.
+
+> GET 메서드는 가져올때, 브라우저에서 캐싱되서 가져올수도 있다. (성능 향상)

@@ -138,3 +138,43 @@ app.use(
   }
 );
 ```
+
+# body-parser
+
+요청의 본문을 해석해주는 미들웨어다.
+
+사용법은 다음과 같다.
+
+```js
+var bodyParser = require("body-parser");
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+```
+
+하지만 express 4.16버전부터는 body-parser의 기능이 익스프레스에 내장되어있기 때문에 다음과 같이 수정할 수 있다.
+
+```js
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+```
+
+json()은 JSON형식의 데이터 전달 방식이고, URL-encoded는 주소 형식으로 데이터를 보내는 방식이다.
+extended옵션은 false인 경우 내장함수인 querystring을 사용하여 해석하고 true면 qs를 사용해여 해석한다.
+
+일반적인 경우에는 위와같이 하면 되지만 본문 데이터가 버퍼, 텍스트일때는 body-parser모듈을 사용해야한다.
+
+```js
+app.use(bodyParser.raw());
+app.use(bodyParser.text());
+```
+
+body-parser를 이용하면 요청의 본문이 req.body에 자동으로 추가된다.
+URL-encoded형식으로 데이터를 보내면 JSON 형태로 req.body에 들어간다.
+
+# cookie-parser
+
+쿠키 파서는 res에 동봉된 쿠키를 JSON형태로 해석해준다.
+이때 해석된 쿠키들은 req.cookies 객체에 들어가게 된다.
+
+쿠키 파서에 첫 번째 인자로 문자열을 넣는데, 암호화된 쿠키가 있는 경우 제공한 문자열을 키로 삼아 복호화할 수 있다.

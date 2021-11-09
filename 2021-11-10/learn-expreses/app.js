@@ -24,21 +24,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(
-  function (req, res, next) {
-    console.log("첫번째 미들웨어");
-    next();
-  },
-  function (req, res, next) {
-    console.log("두번째 미들웨어");
-    next();
-  },
-  function (req, res, next) {
-    console.log("세번째 미들웨어");
-    next();
-  }
-);
-
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 

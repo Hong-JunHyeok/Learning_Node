@@ -45,3 +45,96 @@ views => 템플릿 파일을 모아둔 곳
 Express에서 모델은 데이터 부분 뷰는 템플릿, 마지막으로 컨트롤러는 라우터라고 생각하면 된다.
 
 # Express 구조 이해하기
+
+## www 파일
+
+bin폴더에 www파일은 .js확장자가 없다.
+#!/use/bin/env node라는 주석으로 www파일을 콘솔 명령어로 만들 수 있다.
+
+www파일의 전체적인 구조는 포트를 설정하는 부분, 서버를 생성하는 부분, 서버의 이벤트를 listening하는 부분 이렇게 크게 3가지가 있다.
+
+## app모듈 돌아가는 방식
+
+express 패키지를 호출하여 app이라는 변수 객체를 만든다. 이제 이 변수에 다양한 미들웨어를 넣고 각종 기능을 연결한다.
+
+app.set 메서드로 익스프레스 앱을 설정할 수 있다.
+
+app.use는 미들웨어를 장착하는 부분이다.
+
+app객체를 모듈로 만든다.
+
+# 미들웨어
+
+미들웨어는 요청과 응답 그 사이에 존재하는 것이다.
+미들웨어는 요청과 응답을 조작하여 기능을 추가하기도 하고 요청을 필터링하기도 한다.
+
+app.use()로 장착한 미들웨어는 순차적으로 거친 후 라우터에서 클라이언트로 응답을 보낸다.
+
+> express-generator로 만든 코드는 ES5의 문법이다.
+
+```js
+// 커스텀 미들웨어 만들기
+app.use(function (req, res, next) {
+  console.log(req.url, "나 미들웨어다.");
+  next(); // 다음 미들웨어 호출
+});
+```
+
+next를 호출하지 않으면 미들웨어의 흐름이 끊겨서 응답을 주지않고 무한 로딩상태가 된다.
+
+```js
+// error handler
+app.use(function (err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get("env") === "development" ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render("error");
+});
+```
+
+에러 핸들러의 라우터를 보면 매개변수가 네 개다.
+next함수에 넣어준 인자가 err매개변수로 연결된다. 일반적으로 에러 핸들러는 미들웨어의 가장 하단부에 위치한다.
+
+# app.use의 응용법
+
+하나의 use에 미들웨어를 여러 개 장착할 수 있다.
+
+```js
+app.use(
+  function (req, res, next) {
+    console.log("첫번째 미들웨어");
+    next();
+  },
+  function (req, res, next) {
+    console.log("두번째 미들웨어");
+    next();
+  },
+  function (req, res, next) {
+    console.log("세번째 미들웨어");
+    next();
+  }
+);
+```
+
+이때 순서대로 실행된다.
+
+또한 next의 성질을 이용해 다음과 같은 미들웨어도 만들 수 있다.
+
+```js
+app.use(
+  function (req, res, next) {
+    if (Date.now() % 2 === 0) {
+      return res.status(404).send("실패");
+    } else {
+      next();
+    }
+  },
+  function (req, res, next) {
+    return res.status(200).send("성공");
+    next();
+  }
+);
+```

@@ -24,6 +24,7 @@ http
 
         try {
           const data = await fs.readFile(__dirname + `${req.url}`);
+          // favicon.ico같은 정보들을 넘겨줌
           return res.end(data);
         } catch (error) {
           console.error(error);

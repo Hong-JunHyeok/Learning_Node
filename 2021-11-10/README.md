@@ -178,3 +178,48 @@ URL-encoded형식으로 데이터를 보내면 JSON 형태로 req.body에 들어
 이때 해석된 쿠키들은 req.cookies 객체에 들어가게 된다.
 
 쿠키 파서에 첫 번째 인자로 문자열을 넣는데, 암호화된 쿠키가 있는 경우 제공한 문자열을 키로 삼아 복호화할 수 있다.
+
+# static
+
+static미들웨어는 정적인 파일들을 제공한다.
+
+```js
+app.use(express.static(path.join(__dirname, "public")));
+```
+
+express.static 인자에 정적 파일의 위치를 넣어주면 된다.
+
+```js
+app.use("/image", express.static(path.join(__dirname, "public")));
+```
+
+위와 같이 정적파일을 제공할 주소도 지정할 수 있다.
+그러면 아래와 같은 주소로 요청을 보낼 수 있다.
+`http://localhost:3000/image/abc.png`
+만약, 파일을 찾지 못했다면 요청을 라우터로 넘긴다.
+때문에 정적 파일과 관련된 미들웨어는 최대한 위쪽으로 옮기는게 좋다.
+
+# express-session
+
+세션을 관리하기 위한 미들웨어다.
+
+```js
+app.use(cookieParser("secret code"));
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: "secret code",
+    cookie: {
+      httpOnly: true,
+      secure: false,
+    },
+  })
+);
+```
+
+resave - 요청이 왔을 때 세션에 수정사항이 생기지 않더라도 세션을 다시 저장할지에 대한 설정
+saveUninitialized - 세션에 저장할 내역이 없더라도 세션을 저장할것인가 (방문자 추적)
+secret - 위에 설정한 cookieParser에 인자값과 동일한 값을 전달해주면 된다.
+
+express-session은 세션 관리 시 클라이언트에 쿠키를 보낸다.

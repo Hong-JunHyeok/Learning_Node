@@ -291,5 +291,3 @@ req.query => { name : 'hong' } (Express URLEncoded Middleware)
 
 일반 라우터보다 뒤에 위치시켜야한다.
 와일드카드 역할을 하므로 일반 라우터보다는 뒤에 위치해야 다른 라우터를 방해하지 않는다.
-
-# 라우터 미들웨어의 응답

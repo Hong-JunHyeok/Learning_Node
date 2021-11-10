@@ -195,3 +195,37 @@ block content
 ```
 
 ## EJS
+
+pass;
+
+# 에러 처리 미들웨어
+
+```js
+// error handler
+app.use(function (err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get("env") === "development" ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render("error");
+});
+```
+
+에러 핸들러는 다음과 같은 형태를 띄고있다.
+
+- res.locals.message
+- res.locals.error
+
+템플릿 엔진은 다음 두 값을 읽어서 렌더링해준다.
+또한 `req.app.get("env") === "development" ? err : {}`이 부분은 개발 모드일때는 에러의 내용을 보여주고 배포 모드일때는 에러의 로그를 보여주지 않는 로직이다.
+
+app.get은 app.set했던 값을 가져오는 코드다.
+
+```js
+app.set("view engine", "pug");
+app.get('view engine"); // -> pug
+```
+
+라우터에서는 app에 접근할려면 req.app.get을 하면 된다.

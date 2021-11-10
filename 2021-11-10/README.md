@@ -223,3 +223,73 @@ saveUninitialized - 세션에 저장할 내역이 없더라도 세션을 저장�
 secret - 위에 설정한 cookieParser에 인자값과 동일한 값을 전달해주면 된다.
 
 express-session은 세션 관리 시 클라이언트에 쿠키를 보낸다.
+
+# Router 객체로 라우팅 분리하기
+
+기존에 http 모듈로 라우팅을 할 때에는 url을 if문으로 돌아서 코딩을 했어야했는데, 그런 방식을 Express에서는 Router 객체로 쉽게 라우팅을 할 수 있다. (Express의 장점)
+
+라우터도 하나의 미들웨어이다.
+
+첫번째 인자로 받은 URL로 요청이 들어오게 되면, 뒤의 콜백함수를 실행하는 형태로 동작한다.
+use말고 HTTP Method로 사용할 수 있다. (좀 더 직관적인 코드 작성가능 + 해당 메소드의 요청만 들어왔을 때 실행)
+
+각 라우터마다 기능별로 폴더를 나누는 것이 효과적인 방법이다.
+ex) user router, post router둘을 각 라우터로 분기해서 코드를 짜는 것
+
+```js
+// index.js
+router.use("/user", userRouter);
+router.use("/post", postRouter);
+```
+
+```js
+// user router
+router.delete("/:userId", deleteUser); //* => DELETE /user/:userId
+```
+
+```js
+// post router
+router.get("/:postId", getPost); //* => GET /post/:postId
+```
+
+next 함수에는 특수 기능이 있는데, next('route')다.
+이는, 라우터에 연결된 미들웨어를 건너뛸 때 사용된다.
+
+```js
+router.get(
+  "/",
+  function (req, res, next) {
+    next("route");
+  },
+  function (req, res, next) {
+    console.log("실행이 안됩니다");
+  },
+  function (req, res, next) {
+    console.log("실행이 안됩니다");
+  }
+);
+
+router.get("/", function (req, res) {
+  console.log("실행이 됩니다.");
+  next();
+});
+```
+
+# 라우터 주소의 특수한 패턴
+
+## Params
+
+'/user/:id' -> /user/123 이나 /user/281 같은 라우터도 걸린다.
+req.params => { id: 123 } or { id: 281 } ...
+
+## Query
+
+'/user/123?name=hong'
+req.query => { name : 'hong' } (Express URLEncoded Middleware)
+
+## 특수한 패턴을 사용할 때에 주의점
+
+일반 라우터보다 뒤에 위치시켜야한다.
+와일드카드 역할을 하므로 일반 라우터보다는 뒤에 위치해야 다른 라우터를 방해하지 않는다.
+
+# 라우터 미들웨어의 응답

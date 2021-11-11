@@ -169,3 +169,10 @@ UPDATE [테이블 명] SET [컬럼명=바꿀내용] WHERE [조건]
 ```sql
 DELETE FROM nodejs.users WHERE id=2;
 ```
+
+# 시퀄라이즈
+
+시퀄라이즈는 ORM이다.
+ORM은 JS객체와 데이터베이스의 릴레이션을 매핑해주는 도구다.
+
+자바스크립트 구문을 SQL로 바꿔주는 매우 편한 라이브러리다.

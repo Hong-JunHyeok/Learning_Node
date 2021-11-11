@@ -68,3 +68,104 @@ mysql> DESC nodejs.users;
 | created_at | datetime     | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
 +------------+--------------+------+-----+-------------------+-------------------+
 ```
+
+# 외례키 설정하기
+
+```sql
+CONSTRAINT [제약조건명] FOREIGN KEY [컬럼명] REFERENCES [참고하는 컬럼명]
+```
+
+외례키 ON 속성
+
+```sql
+ON DELETE CASCADE
+```
+
+레퍼런스의 값이 삭제되었을 때, 외례키의 로우 값도 삭제.
+
+```sql
+ON UPDATE CASCADE
+```
+
+레퍼런스의 값이 수정되었을 때, 외례키의 로우 값도 수정.
+
+# CRUD
+
+## 데이터 추가
+
+```sql
+-- 유저 정보 추가
+INSERT INTO nodejs.users (name, age, married, comment) VALUES ('Hong', 18, 0, '저는 풀스택을 공부하고있는 개발자 홍준혁입니다.');
+
+-- 댓글 추가
+INSERT INTO nodejs.comments (commenter, comment) VALUES (1, '첫 댓글입니다.');
+```
+
+## 데이터 읽기
+
+```sql
+-- 모든 유저 조회
+SELECT * FROM nodejs.users;
+
+-- 모든 댓글 조회
+SELECT * FROM nodejs.comments;
+```
+
+특정 컬럼을 조회하고 싶을 때에는 조회를 원하는 컬럼을 SELECT 다음에 넣어주면 된다.
+
+```sql
+-- 모든 유저의 name과 comment컬럼을 가져옴
+SELECT name, comment FROM nodejs.users;
+```
+
+WHERE문으로 특정 조건을 충족하는 데이터만 가져오게 할 수도 있다.
+
+```sql
+-- 결혼도 했고 나이가 20살 초과인 사람을 가져옴
+SELECT name, age FROM nodejs.users WHERE married = 1 AND age > 20;
+```
+
+AND는 모두 다 충족 할때의 로우를 가지고 오는데,
+OR을 쓰면 둘 중 하나라도 충족할 때 가져온다.
+
+```sql
+-- 결혼을 했거나 나이가 10 초과인 사람을 가져옴
+SELECT name, age FROM nodejs.users WHERE married = 1 OR age > 10;
+```
+
+ORDER BY [컬럼명] [ASC | DESC]로 데이터를 정렬할 수 있다.
+
+```sql
+-- 나이가 많은 순으로 정렬
+SELECT name, age FROM nodejs.users ORDER BY age DESC;
+```
+
+조회할 로우의 개수도 지정할 수 있다.
+
+```sql
+SELECT name, age FROM nodejs.users ORDER BY age DESC LIMIT 1;
+```
+
+LIMIT로 첫 한개의 값만 가져오는 것도 가능하다.
+
+몇 개를 건너뛸지 설정도 가능하다.
+
+```sql
+SELECT name, age FROM nodejs.users ORDER BY age DESC LIMIT 1 OFFSET 1;
+```
+
+OFFSET [건너뛸 숫자] - 만약 페이지네이션을 한다면 유용한 기능이다.
+
+## 데이터 수정
+
+```sql
+ UPDATE nodejs.users SET comment='수정된 내용입니다.' WHERE id=1;
+```
+
+UPDATE [테이블 명] SET [컬럼명=바꿀내용] WHERE [조건]
+
+## 데이터 삭제
+
+```sql
+DELETE FROM nodejs.users WHERE id=2;
+```

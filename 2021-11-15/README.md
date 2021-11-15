@@ -178,3 +178,37 @@ User.findAll({
   },
 });
 ```
+
+시퀄라이즈로 정렬된 데이터를 조회하는 방법이다.
+
+```js
+User.findAll({
+  attributes: ["id", "name"],
+  order: [["age", "DESC"]],
+});
+```
+
+order이 왜 이중배열로 이루어져 있냐면 여러 컬럼에 정열 값을 줄 수 있기 때문이다.
+
+## update 메서드로 로우 수정하기
+
+```js
+User.update(
+  {
+    comment: "수정된 내용",
+  },
+  {
+    where: { id: 2 },
+  }
+);
+```
+
+첫 번째 인자는 수정할 내용, 두 번째 인자는 수정 대상 로우를 찾는 조건이다.
+
+## destroy 메서드로 로우 삭제하기
+
+```js
+User.destroy({
+  where: { id: 2 },
+});
+```

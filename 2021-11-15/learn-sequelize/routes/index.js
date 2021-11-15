@@ -1,9 +1,17 @@
 var express = require("express");
+const { User } = require("../models");
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("sequelize", { users: [] });
+  User.findAll()
+    .then((users) => {
+      res.render("sequelize", { users });
+    })
+    .catch((error) => {
+      console.error(error);
+      next(error);
+    });
 });
 
 module.exports = router;

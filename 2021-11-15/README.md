@@ -93,7 +93,7 @@ db.Comment.belongsTo(db.User, { foreignKey: "commenter", targetKey: "id" });
 User 모델에 id를 소스키로 설정하고, Comment 모델에서 User의 소스키를 타겟키로 설정함으로서 commenter를 User의 id로 설정한 것이다.
 만들어진 Comment테이블을 보면
 ![](https://images.velog.io/images/hjh040302/post/2ff3f7ec-0b3c-4ea0-bdb9-6b0d195ea345/image.png)
-정상적으로 외례키가 잘 설정되었다.
+정상적으로 외래키가 잘 설정되었다.
 
 # 시퀄라이즈 쿼리 사용해보기
 

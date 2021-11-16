@@ -267,3 +267,153 @@ router.get("/logout", isLoggedIn, (req, res, next) => {
 ```
 
 `req.logout();`는 req.user를 제거한다.다음 `req.session.destroy();`는 req.session의 객체를 제거한다.
+
+## 로그인 전략짜기
+
+```js
+const LocalStrategy = require("passport-local").Strategy;
+const bcrypt = require("bcrypt");
+
+const { User } = require("../models");
+
+module.exports = (passport) => {
+  passport.use(
+    new LocalStrategy(
+      {
+        usernameField: "email",
+        passwordField: "password",
+      },
+      async (email, password, done) => {
+        try {
+          const exUser = await User.findOne({ where: { email } });
+          if (exUser) {
+            const result = await bcrypt.compare(password, exUser.password);
+            if (result) {
+              done(null, exUser);
+            } else {
+              done(null, false, { message: "비밀번호가 일치하지 않습니다." });
+            }
+          } else {
+            done(null, false, { message: "가입되지 않은 회원입니다." });
+          }
+        } catch (error) {
+          console.error(error);
+          done(error);
+        }
+      }
+    )
+  );
+};
+```
+
+usernameField, passwordField에는 일치하는 req.body의 속성명을 적어주면 된다.
+async 함수는 전략을 실행하는 함수다.
+done은 passport.authenticate의 콜백함수이다.
+
+`bcrypt.compare`로 암호화한 비밀번호와 req에서 전달받은 비밀번호와 일치한지 비교한다. 만약 비밀번호가 일치한다면 done 함수의 두 번째 인자로 사용자 정보를 전달한다.
+done에 전달된 값은 authenticate에 차례차례 전달된다.
+
+```js
+//done(null, exUser);
+(authError, user, info) => {
+  /*...*/
+};
+```
+
+이제 Kakao 로그인도 해보도록 하겠다.
+로그인 인증 과정을 카카오에 맡기는 것의 의미한다.
+장점은 사용자는 새로 회원가입 하지 않아도 되고, 서비스 제공자는 로그인 과정을 검증된 SNS에 맡길수 있어서 좋다.
+
+## 카카오 로그인 전략 작성하기
+
+```js
+const KakaoStrategy = require("passport-kakao");
+
+const { User } = require("../models");
+
+module.exports = (passport) => {
+  passport.use(
+    new KakaoStrategy(
+      {
+        clientId: process.env.KAKAO_ID,
+        callbackURL: "/auth/kakao/callback",
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const exUser = await User.findOne({
+            where: { snsId: profile.id, provider: "kakao" },
+          });
+          if (exUser) {
+            done(null, exUser);
+          } else {
+            const newUser = await User.create({
+              email: profile._json && profile._json.kaccount_email,
+              nick: profile.displayName,
+              snsId: profile.id,
+              provider: "kakao",
+            });
+            done(null, newUser);
+          }
+        } catch (error) {
+          console.error(error);
+          done(error);
+        }
+      }
+    )
+  );
+};
+```
+
+과정이 꽤나 복잡해졌다. clientId는 카카오에서 발급해주는 아이디이다.
+노출이 되면 안되므로 env로 숨겨놓았다.
+callbackURL은 인증 결과를 받을 라우터 주소다.
+
+이제 카카오 로그인을 하는 라우터를 작성해야 한다.
+
+```js
+router.get("/kakao", passport.authenticate("kakao"));
+```
+
+다음 라우터로 접근하면 카카오 로그인 과정이 실행된다.
+그 결과를 받을 callback라우터를 작성해보도록 하자.
+
+```js
+router.get(
+  "/kakao/callback",
+  passport.authenticate("kakao", {
+    failureRedirect: "/",
+  }),
+  (req, res) => {
+    res.redirect("/");
+  }
+);
+```
+
+이제 만든 라우터를 app.js에 연결해보자.
+
+```js
+const pageRouter = require("./routes/page");
+const authRouter = require("./routes/auth");
+
+app.use("/", pageRouter);
+app.use("/auth", authRouter);
+```
+
+이제 코드상에서 할 수 있는 작업은 다했다.
+카카오 clientID를 발급받아야한다.
+[카카오 Developers링크](https://developers.kakao.com/)에 접속하여 로그인을 진행한 후 애플리케이션을 생성한다.
+
+![](https://images.velog.io/images/hjh040302/post/75953bbe-b37e-4864-917e-fafbfba44a26/image.png)
+다음 REST API 키를 복사해 .env에 다음과 같이 작성해준다.
+
+```
+KAKAO_ID=발급받은KEY
+```
+
+**내 애플리케이션 > 앱 설정 > 플랫폼**에 들어가서 웹 플랫폼을 추가한다.
+사이트 도메인에 본인 서비스주소, callbackURL도 동일하게 작성해준다.
+![](https://images.velog.io/images/hjh040302/post/46a6a0a6-8a59-4be4-b3a1-7017ae41d59b/image.png)
+
+![](https://images.velog.io/images/hjh040302/post/f5b3249b-b3a3-44c4-a3ae-3125cce701c0/image.png)
+
+이제 서버를 키고 로그인 작업이 잘 되는지 확인한다.

@@ -15,7 +15,7 @@
 - [2021-11-11](./2021-11-11/README.md)
 - [2021-11-12](./2021-11-12/README.md)
 - [2021-11-15](./2021-11-15/README.md)
-- [SNS-service](./SNS-service/README.md)
+- [SNS-service](./SNS-service)
 
 # 평범한 자바스크립트가 아니다.
 
@@ -73,3 +73,95 @@ N : M의 관계는 belongsToMany메서드로 정의한다.
 같은 테이블간의 N : M 관계에서는 모델 이름과 컬럼이름을 따로 정해줘야 한다.
 그렇지 않으면 같은 테이블의 이름이 중복된 중간 테이블이 생성되기 때문이다.
 만약 Follow라는 중간 테이블을 생성한다고 했을때 followerId, followingId 두 개의 컬럼이 존재해야 한다.
+
+# Passport로 로그인 구현하기
+
+```console
+npm i passport passport-local passport-kakao bcrypt
+```
+
+Kakao 로그인 기능도 추가로 구현해보겠다.
+app.js에 다음과 같이 코드를 작성한다.
+
+```js
+const passport = require("passport");
+
+const passportConfig = require("./passport");
+
+passportConfig(passport);
+
+// ...Middlewares
+app.use(passport.initialize());
+app.use(passport.session());
+```
+
+passport 모듈은 나중에 작성을 할것이다.
+`app.use(passport.initialize());`는 미들웨어 req에 passport 설정을 추가하고, `app.use(passport.session());`미들웨어는 req.session객체에 passport 정보를 추가한다.
+여기서 미들웨어의 순서가 중요한데, express-session의 미들웨어의 밑에 위치해야 한다.
+
+이제 Passport 모듈을 작성해보자
+
+```js
+// passport/index.js
+const local = require("./localStrategy");
+const kakao = require("./kakaoStrategy");
+const { User } = require("../models");
+
+module.exports = (passport) => {
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser((id, done) => {
+    User.findOne({ where: { id } })
+      .then((user) => done(null, user))
+      .catch((error) => done(error));
+  });
+
+  local(passport);
+  kakao(passport);
+};
+```
+
+`passport.serializeUser`와 `passport.deserializeUser`는 passport의 핵심이다.
+
+`serializeUser`는 req.session객체에 어떤 데이터를 저장할지 선택한다. 매개변수로 user를 받아서 done함수에 두 번째 인자로 user.id를 넘기고 있는데, done인자의 첫 번째 인자는 에러 발생 시 사용되는 인자다. 두 번째 인자가 중요하다.
+
+세션에 사용자 정보를 모두 저장하면 용량이 커지는 등의 문제가 발생한다. 즉, 사용자의 아이디만 저장해서 용량을 확보하는 passport의 전략이다.
+
+`deserializeUser`는 매 요청시 실행되는 함수다. passport.session() 미들웨어가 이 메서드를 호출하는데, serializeUser에서 저장했던 아이디를 받아서 데이터베이스에서 정보를 조회한 후, req.user에 저장한다.
+앞으로 req.user에 user의 정보를 가져올 수 있다.
+
+앞으로 진행될 로그인 플로우를 정리하자면 다음과 같다.
+
+1. 로그인 요청이 들어옴
+2. passport.authenticate 메서드 호출
+3. 로그인 전략 수행
+4. 로그인 성공 시 사용자 정보 객체와 함께 req.login 호출
+5. req.login메서드가 passport.serializeUser 호출
+6. req.session에 사용자 아이디만 저장
+7. 로그인 완료
+
+## 로컬 로그인 구현하기
+
+passport-local을 통해서 로컬 로그인을 구현한다.
+그 전에 사용자의 로그인 여부에 따라 적절한 응답을 해주는 미들웨어를 만들어보았다.
+
+```js
+exports.isLoggedIn = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.status(403).send("로그인 필요");
+  }
+};
+exports.isNotLoggedIn = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/");
+  }
+};
+```
+
+Passport가 추가해주는 isAuthenticated메서드로 사용자가 로그인 했는지 안했는지 판별할 수 있다.

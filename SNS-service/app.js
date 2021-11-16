@@ -4,12 +4,16 @@ const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+
+const passportConfig = require("./passport");
 const { sequelize } = require("./models");
 
 require("dotenv").config();
 
 const app = express();
 sequelize.sync();
+passportConfig(passport);
 
 app.set("views", path.join(__dirname, "views")); // 뷰 템플릿들이 정의되어 있는 폴더의 절대주소를 명시함.
 app.set("view engine", "pug"); // view engine을 pug로 사용함.
@@ -33,6 +37,8 @@ app.use(
   })
 );
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
 
 const pageRouter = require("./routes/page");
 app.use("/", pageRouter);

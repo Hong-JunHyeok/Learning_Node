@@ -165,3 +165,105 @@ exports.isNotLoggedIn = (req, res, next) => {
 ```
 
 Passport가 추가해주는 isAuthenticated메서드로 사용자가 로그인 했는지 안했는지 판별할 수 있다.
+
+```js
+router.get("/profile", isLoggedIn, (req, res) => {
+  res.render("profile", {
+    title: "내 정보 - SNS",
+    user: req.user, //? 추후에 user정보를 넣을 예정.
+  });
+});
+
+router.get("/join", isNotLoggedIn, (req, res) => {
+  res.render("join", {
+    title: "회원가입 - SNS",
+    user: req.user,
+    joinError: req.flash("joinError"), //* 일회성 메세지
+  });
+});
+```
+
+다음과 같이 작성하면 앞서 만들었던 미들웨어를 사용할 수 있다.
+이제 auth 관련 미들웨어를 작성해보도록 하자.
+
+```js
+const express = require("express");
+const passport = require("passport");
+const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
+const bcrypt = require("bcrypt");
+
+const router = express.Router();
+
+router.post("/join", isNotLoggedIn, (req, res, next) => {});
+router.post("/login", isNotLoggedIn, (req, res, next) => {});
+router.get("/logout", isLoggedIn, (req, res, next) => {});
+
+module.exports = router;
+```
+
+라우트는 다음과 같은 구조로 잡고 각 라우트를 개발해보도록 하겠다.
+
+```js
+// join router
+router.post("/join", isNotLoggedIn, (req, res, next) => {
+  const { email, nick, password } = req.body;
+  try {
+    const exUser = await User.findOne({ where: { email } });
+    if (exUser) {
+      req.flash("joinError", "이미 가입된 이메일입니다.");
+      return res.redirect("/join");
+    }
+    const hash = await bcrypt.hash(password, 12);
+    await User.create({
+      email,
+      nick,
+      password: hash,
+    });
+    return res.redirect("/");
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+});
+```
+
+회원가입 라우트는 이미 존재하는 유저라면 User.create를 진행하지 않고 flash 메시지를 전달한다.
+존재하는 유저가 아니라면 회원가입을 진행하는데, 비밀번호는 암호화된 값을 넣어준다. `bcrypt.hash`메서드는 첫번째 인자로 암호화할 값, 두번째 인자로 암호화 반복 횟수를 지정한다. 크면 클수록 복호화가 복잡해진다.
+
+```js
+// login router
+router.post("/login", isNotLoggedIn, (req, res, next) => {
+  passport.authenticate("local", (authError, user, info) => {
+    if (authError) {
+      console.error(authError);
+      return next(authError);
+    }
+
+    if (!user) {
+      req.flash("loginError", info.message);
+      return res.redirect("/");
+    }
+    return req.login(user, (loginError) => {
+      if (loginError) {
+        console.error(loginError);
+        return next(loginError);
+      }
+      return res.redirect("/");
+    });
+  });
+});
+```
+
+로그인 라우터는 `passport.authenticate`가 로그인 전략을 실행한다.
+로그인 전략은 아직 작성하지 않았으므로 로그아웃 라우터 다음에 작성해보도록 하겠다.
+
+```js
+// logout router
+router.get("/logout", isLoggedIn, (req, res, next) => {
+  req.logout();
+  req.session.destroy();
+  req.redirect("/");
+});
+```
+
+`req.logout();`는 req.user를 제거한다.다음 `req.session.destroy();`는 req.session의 객체를 제거한다.

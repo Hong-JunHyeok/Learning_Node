@@ -4,10 +4,12 @@ const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const flash = require("connect-flash");
+const { sequelize } = require("./models");
 
 require("dotenv").config();
 
 const app = express();
+sequelize.sync();
 
 app.set("views", path.join(__dirname, "views")); // 뷰 템플릿들이 정의되어 있는 폴더의 절대주소를 명시함.
 app.set("view engine", "pug"); // view engine을 pug로 사용함.

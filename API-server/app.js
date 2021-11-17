@@ -42,7 +42,9 @@ app.use(passport.session());
 
 const indexRouter = require("./routes");
 const authRouter = require("./routes/auth");
+const v1 = require("./routes/v1");
 
+app.use("/v1", v1);
 app.use("/", indexRouter);
 app.use("/auth", authRouter);
 
